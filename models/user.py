@@ -7,3 +7,7 @@ class User(BaseModel):
     name = CharField()
     password = CharField()
     rightsLevel = IntegerField()
+    rating = IntegerField()
+    totalTime = IntegerField()
+    solvedCorrectly = IntegerField()
+    solvedIncorrectly = IntegerField()
