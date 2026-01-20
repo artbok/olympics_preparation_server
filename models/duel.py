@@ -1,5 +1,5 @@
 from peewee import *
-from.base_model import BaseModel
+from base_model import BaseModel
 
 class Duel(BaseModel):
     firstUserId = IntegerField()
