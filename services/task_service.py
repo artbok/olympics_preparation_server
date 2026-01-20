@@ -1,10 +1,11 @@
 from peewee import *
-from models.base_model import task
+from models.task import Task
 
 
 def createTask(subject, topic, difficulty, description, hint):
-    task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint)
+    Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint)
     
-def deleteItem(taskId):
-    task = task.get(taskId)
+
+def deleteTask(taskId):
+    task: Task = Task.get(taskId)
     task.delete_instance()
