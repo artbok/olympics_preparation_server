@@ -1,2 +1,6 @@
 data.db
 test.py
+services/__pycache__
+routes/__pycache__
+__pycache__
+models/__pycache__
