@@ -5,3 +5,6 @@ from models.base_model import task
 def createTask(subject, topic, difficulty, description, hint):
     task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint)
     
+def deleteItem(taskId):
+    task = task.get(taskId)
+    task.delete_instance()
