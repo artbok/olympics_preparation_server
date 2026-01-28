@@ -4,6 +4,12 @@ from services.user_service import *
 
 users_bp = Blueprint("users", __name__)
 
+@users_bp.route('/getElo', methods=['POST'])
+def new_user():
+    data = request.json
+    username = data["username"]
+    user: User = getUser(username)
+    return jsonify({'status': 'ok', "elo": user.rating})
 
 @users_bp.route('/newUser', methods=['POST'])
 def new_user():

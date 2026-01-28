@@ -1,10 +1,10 @@
 from flask import Flask
 from routes.users import users_bp
-
+from routes.tasks import tasks_bd
 
 app = Flask(__name__)
 app.register_blueprint(users_bp)
-
+app.register_blueprint(tasks_bd)
     
 
 @app.after_request
