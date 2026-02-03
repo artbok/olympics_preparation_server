@@ -9,3 +9,5 @@ def createTask(subject, topic, difficulty, description, hint):
 def deleteTask(taskId):
     task: Task = Task.get(taskId)
     task.delete_instance()
+
+    
