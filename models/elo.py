@@ -23,5 +23,5 @@ def changeRating(nameA, nameB, ratingA, ratingB, scoreA, scoreB):
   userB: User = getUser(nameB)
   deltaRatingA=newRatingA-userA.rating
   deltaRatingB=newRatingB-userB.rating
-  UpdateRating(nameA, deltaRatingA)
-  UpdateRating(nameB, deltaRatingB)
+  updateRating(nameA, deltaRatingA)
+  updateRating(nameB, deltaRatingB)

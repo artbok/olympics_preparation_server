@@ -32,24 +32,14 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
-def getRatingChanges(name):
-    user: User = getUser(name)
-    return map(int, user.ratingChanges.split('/'))
 
-def addRatingChange(user, newDeltaRating):
-    ratingChangesList = user.getRatingChanges()
-    ratingChangesList.append(newDeltaRating)
-
-    if len(ratingChangesList)>10:
-        return '/'.join(ratingChangesList[-10:])
-    return '/'.join(ratingChangesList)
-    
 def updateRating(name, deltaRating):
     user: User = getUser(name)
     user.rating += deltaRating
-    User.addRatingChange(user,deltaRating)
-
-
+    
+    ratingChangesList = map(int, user.ratingChanges.split('/'))
+    ratingChangesList.append(deltaRating)
+    return '/'.join(ratingChangesList)
 
 if not User.table_exists():
     User.create_table()
