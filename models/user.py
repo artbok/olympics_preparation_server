@@ -1,6 +1,6 @@
 from peewee import *
 from models.base_model import BaseModel
-
+from json import *
 
 class User(BaseModel):
     id = AutoField()
@@ -11,3 +11,5 @@ class User(BaseModel):
     totalTime = IntegerField(default=0)
     solvedCorrectly = IntegerField(default=0)
     solvedIncorrectly = IntegerField(default=0)
+    ratingChanges = CharField(default='0')
+    

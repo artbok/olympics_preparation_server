@@ -1,6 +1,6 @@
 from peewee import *
 from models.user import User
-
+from json import *
 
 def createUser(name, password, rightsLevel):
     User.create(name = name, password = password, rightsLevel = rightsLevel)
@@ -33,6 +33,15 @@ def getUsers() -> list[User]:
     return users
 
 
+def updateRating(name, deltaRating):
+    user: User = getUser(name)
+    user.rating += deltaRating
+    
+    ratingChangesList = map(int, user.ratingChanges.split('/'))
+    ratingChangesList.append(deltaRating)
+    return '/'.join(ratingChangesList)
+
 if not User.table_exists():
     User.create_table()
     print("Table 'User' created")
+
