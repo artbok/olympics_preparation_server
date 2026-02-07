@@ -40,8 +40,8 @@ def isAdmin(username, password) -> str: #!!!!
 def isUser(username, password) -> bool:
     user: User = getUser(username)
     if user and verify_password(password, user.password):
-        return True
-    return False
+        return "ok"
+    return "wrong_credentials"
 
 
 def getUsers() -> list[User]:

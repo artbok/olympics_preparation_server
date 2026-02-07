@@ -27,9 +27,13 @@ def delete_task():
 def get_tasks():
     data = request.json
     status = isUser(data["username"], data["password"])
-    if status:
-        return getTasks(data["subject"], data["topic"], data["difficulty"], data["description"], data["page"])
+    if status == "ok":
+        return jsonify({"status": status, 
+                        "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
+                        "topics": getTopics(),
+                        "totalPages": countTasksPages()})
     return jsonify({"status": "wrong_credentials"})
+
 
 @tasks_bp.route('/upload', methods=['POST'])
 def upload_task():

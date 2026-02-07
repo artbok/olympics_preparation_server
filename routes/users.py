@@ -22,7 +22,9 @@ def new_user():
 @users_bp.route('/authUser', methods=['POST'])
 def auth_user():
     data = request.json 
-    if not isUser(data["username"], data["password"]):
-        return jsonify({'status': 'invalidLogin'})
-    user: User = getUser(data["username"])
-    return jsonify({'status': 'ok', 'rightsLevel': user.rightsLevel})
+    status = isUser(data["username"], data["password"])
+    if status == "ok":
+        user: User = getUser(data["username"])
+        return jsonify({'status': status, 'rightsLevel': user.rightsLevel})
+    return jsonify({'status': status})
+    
