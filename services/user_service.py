@@ -1,27 +1,45 @@
 from peewee import *
 from models.user import User
+import bcrypt
 
 
-def createUser(name, password, rightsLevel):
-    User.create(name = name, password = password, rightsLevel = rightsLevel)
+def hash_password(password: str):
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode('utf-8')
 
 
-def getUser(name) -> User:
-    return User.get_or_none(User.name == name)
+def verify_password(plain_password: str, stored_hash: str):
+    pwd_bytes = plain_password.encode('utf-8')
+    hash_bytes = stored_hash.encode('utf-8')
+    return bcrypt.checkpw(pwd_bytes, hash_bytes)
 
 
-def isAdmin(name, password) -> str:
-    user: User = getUser(name)
-    if not user or user.password != password:
-        return 'authError'
+def createUser(username, password, rightsLevel):
+    if getUser(username):
+        return "user_already_exists"
+    hashed_password = hash_password(password)
+    User.create(name = username, password = hashed_password, rightsLevel = rightsLevel)
+    return "ok"
+
+
+def getUser(username) -> User:
+    return User.get_or_none(User.name == username)
+
+
+def isAdmin(username, password) -> str: #!!!!
+    user: User = getUser(username)
+    if not user or not verify_password(password, user.password):
+        return 'wrong_credentials'
     if user.rightsLevel < 2:
-        return 'accessError'
+        return 'access_denied'
     return 'ok'
 
 
-def isUser(name, password) -> bool:
-    user: User = getUser(name)
-    if user and user.password == password:
+def isUser(username, password) -> bool:
+    user: User = getUser(username)
+    if user and verify_password(password, user.password):
         return True
     return False
 
