@@ -1,0 +1,4 @@
+peewee
+flask
+flask-socketio
+bcrypt
