@@ -2,6 +2,7 @@ from peewee import *
 from models.task import Task
 from playhouse.shortcuts import model_to_dict
 
+
 def createTask(subject, topic, difficulty, description, hint, answer):
     Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer)
     
@@ -42,3 +43,6 @@ TO BE ADDED
     returns List<Task>
 """
 
+if not Task.table_exists():
+    Task.create_table()
+    print("Table 'Task' created")
