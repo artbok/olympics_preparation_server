@@ -24,14 +24,12 @@ def auth_user():
 
 @users_bp.route('/getProfile', methods=['POST'])
 def get_profile():
-        data = request.json
+    data = request.json
 
-        if not data or 'username' not in data:
-            return jsonify({
-                'status': 'error',
-                'message': 'Требуется поле username'
-            })
-        
-        username = data['username']
-        profile_data = getProfile(username)
-        return jsonify(profile_data)
+    if not data or 'username' not in data:
+        print('error')
+        return 0
+    
+    username = data['username']
+    profile_data = getProfile(username)
+    return jsonify(profile_data)

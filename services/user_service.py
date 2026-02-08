@@ -37,12 +37,17 @@ def updateRating(name, deltaRating):
     user: User = getUser(name)
     user.rating += deltaRating
     
-    ratingChangesList = map(int, user.ratingChanges.split('/'))
+    ratingChangesList = list(map(int, user.ratingChanges.split('/')))
     ratingChangesList.append(deltaRating)
-    return '/'.join(ratingChangesList)
+    user.ratingChanges = '/'.join(map(str, ratingChangesList))
+    user.save()
+    return user.ratingChanges
 
 def getProfile(name):
-    user = getUser(name)   
+    user: User = getUser(name)
+    if not user:
+        return None
+    
     return {
         "rating": user.rating,
         "username": user.name,
@@ -50,7 +55,7 @@ def getProfile(name):
         "totalTime": user.totalTime,
         "solvedCorrectly": user.solvedCorrectly,
         "solvedIncorrectly": user.solvedIncorrectly,
-        "ratingChanges": user.ratingChanges
+        #"ratingChanges": list(map(int, user.ratingChanges.split('/')))
     }
 
 if not User.table_exists():
