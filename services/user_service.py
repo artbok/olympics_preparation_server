@@ -41,6 +41,18 @@ def updateRating(name, deltaRating):
     ratingChangesList.append(deltaRating)
     return '/'.join(ratingChangesList)
 
+def getProfile(name):
+    user = getUser(name)   
+    return {
+        "rating": user.rating,
+        "username": user.name,
+        "rightsLevel": user.rightsLevel,
+        "totalTime": user.totalTime,
+        "solvedCorrectly": user.solvedCorrectly,
+        "solvedIncorrectly": user.solvedIncorrectly,
+        "ratingChanges": user.ratingChanges
+    }
+
 if not User.table_exists():
     User.create_table()
     print("Table 'User' created")

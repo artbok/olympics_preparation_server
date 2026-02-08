@@ -21,3 +21,17 @@ def auth_user():
         return jsonify({'status': 'invalidLogin'})
     user: User = getUser(data["username"])
     return jsonify({'status': 'ok', 'rightsLevel': user.rightsLevel})
+
+@users_bp.route('/getProfile', methods=['POST'])
+def get_profile():
+        data = request.json
+
+        if not data or 'username' not in data:
+            return jsonify({
+                'status': 'error',
+                'message': 'Требуется поле username'
+            })
+        
+        username = data['username']
+        profile_data = getProfile(username)
+        return jsonify(profile_data)
