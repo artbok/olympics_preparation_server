@@ -11,3 +11,4 @@ class User(BaseModel):
     totalTime = IntegerField(default=0)
     solvedCorrectly = IntegerField(default=0)
     solvedIncorrectly = IntegerField(default=0)
+    ratingChanges = TextField(default="12/20/30/-50/10")
