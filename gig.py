@@ -6,6 +6,7 @@ import logging
 import re
 import json 
 from routes.tasks import createTask
+from models.task import Task
 
 gig_bp = Blueprint("gig", __name__)
 logging.basicConfig(level=logging.INFO)
@@ -80,23 +81,18 @@ def generate_task():
             return jsonify({'error': 'Prompt is required'}), 400
         
         token = auth_manager.get_valid_token()
-        system_prompt = """Ты — генератор учебных задач. Сгенерируй ОДНУ задачу в СТРОГОМ формате JSON.
-
-Формат задачи:
-{{
-  название предмета
-  тема задачи
-  Уровень лёгкий/средний/сложный
-  Полное условие задачи
-  Подсказка: краткая подсказка для решения
-  Ответ: нужен правильный ответ задачи, без решения
-}}
-
-ВАЖНО:
-- Отвечай ТОЛЬКО валидным JSON объектом (не массив!)
-- Не добавляй никакого другого текста до или после JSON
-- Сгенерируй ровно ОДНУ задачу
-- Все поля обязательны, не оставляй их пустыми"""
+        
+        system_prompt = """Ты — генератор учебных задач. Сгенерируй ОДНУ задачу строго в формате JSON.
+Формат:
+{
+  "subject": "название предмета",
+  "topic": "тема",
+  "difficulty": "Простой/Средний/Сложный",
+  "description": "текст задачи",
+  "hint": "подсказка",
+  "answer": "ответ",
+  "explanation": "объяснение"
+}"""
         
         headers = {
             'Authorization': f'Bearer {token}',
@@ -106,9 +102,10 @@ def generate_task():
         chat_data = {
             "model": "GigaChat",
             "messages": [
-                {"role": "system"},
-                {"role": "user", "content": f"Сгенерируй задачи: {prompt} и {system_prompt}"}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
             ],
+            "temperature": 1.0
         }
         
         response = requests.post(
@@ -118,31 +115,51 @@ def generate_task():
             verify=False
         )
         
-        if response.status_code == 401:
-            auth_manager.get_token()
-            token = auth_manager.get_valid_token()
-            headers['Authorization'] = f'Bearer {token}'
-            
-            response = requests.post(
-                "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
-                headers=headers,
-                json=chat_data,
-                verify=False
-            )
+        result = response.json()
         
-        result = response.json()  
-        answer = result['choices'][0]['message']['content']
-        answer = re.sub(r'[#\$\{\}\"]+', '', answer, flags=re.DOTALL)
-        tasks = [line.strip() for line in answer.split('\n') if line.strip()]
+        if 'choices' not in result:
+             return jsonify({'error': 'GigaChat error', 'details': result}), 500
+
+        content = result['choices'][0]['message']['content']
+        
+        try:
+            start_idx = content.find('{')
+            end_idx = content.rfind('}') + 1
+            if start_idx == -1: raise ValueError("JSON not found")
+            task_json = json.loads(content[start_idx:end_idx])
+        except Exception:
+            # Fallback (если вдруг JSON не распарсился)
+            return jsonify({'error': 'Failed to parse JSON', 'content': content}), 500
+
+        # --- ИСПРАВЛЕНИЕ ЗДЕСЬ ---
+        # Используем Task.create напрямую, так как она возвращает созданный объект
+        new_task = Task.create(
+            subject=task_json.get('subject', 'Сгенерировано'),
+            topic=task_json.get('topic', 'Общее'),
+            difficulty=task_json.get('difficulty', 'Средний'),
+            description=task_json.get('description', 'Ошибка описания'),
+            hint=task_json.get('hint', ''),
+            answer=task_json.get('answer', ''),
+            explanation=task_json.get('explanation', '')
+        )
         
         return jsonify({
-            'tasks': tasks
+            'success': True,
+            'task': {
+                'id': new_task.id,  # Теперь new_task — это объект, и id существует
+                'description': new_task.description,
+                'subject': new_task.subject,
+                'difficulty': new_task.difficulty,
+                'hint': new_task.hint,
+                'answer': new_task.answer,
+                'explanation': new_task.explanation
+            }
         })
         
     except Exception as e:
         logger.error(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
-    
+        
 @gig_bp.route('/token/status', methods=['GET'])
 def token_status():
     return jsonify({
