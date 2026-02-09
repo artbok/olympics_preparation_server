@@ -87,14 +87,17 @@ def getProfile(name):
 
 
 def updateUserRating(username, new_rating):
-    try:
-        user = User.get(User.name == username)
-        user.rating = new_rating
-        user.save()
-        return True
-    except User.DoesNotExist:
-        return False
-    
+    user = User.get(User.name == username)
+    delta = new_rating - user.rating
+    user.rating = new_rating
+    if user.ratingChanges:
+        user.ratingChanges = f"{user.ratingChanges}/{delta}"
+    else:
+        user.ratingChanges = str(delta)
+        
+    user.save()
+    return True
+
 
 if not User.table_exists():
     User.create_table()
