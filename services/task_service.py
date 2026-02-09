@@ -3,21 +3,22 @@ from models.task import Task
 from playhouse.shortcuts import model_to_dict
 from math import ceil
 
-def createTask(subject, topic, difficulty, description, hint, answer):
-    Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer)
+def createTask(subject, topic, difficulty, description, hint, answer, explanation):
+    Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer, explanation = explanation)
     
 
 def deleteTask(taskId):
     task: Task = Task.get(taskId)
     task.delete_instance()
 
-def editTask(taskId, taskDescription, taskSubject, taskDifficulty, taskHint, taskAnswer, taskTopic):
+def editTask(taskId, taskDescription, taskSubject, taskDifficulty, taskHint, taskAnswer, taskExplanation, taskTopic):
     task: Task = Task.get(taskId)
     task.description = taskDescription
     task.subject = taskSubject
     task.difficulty = taskDifficulty
     task.hint = taskHint
     task.answer = taskAnswer
+    task.explanation = taskExplanation
     task.topic = taskTopic
     task.save()
 
@@ -45,31 +46,26 @@ def getTopics():
 
 def countTasksPages():
     return ceil(Task.select().count() / 10)
-print(getTopics())
+
 
 if not Task.table_exists():
     Task.create_table()
     print("Table 'Task' created")
-"""
-TO BE ADDED
-- getTasks(subject, topic, difficulty, description)
-      subject, topic, difficulty, description - optional filters
-    returns List<Task>
-"""
-createTask("Математика", "Сложение чисел", "Простой", "2 + 2 = ?", "Посчитай по пальцам", "4")
-createTask("Математика", "Сложение чисел", "Простой", "2 + 3 = ?", "Посчитай по пальцам", "5")
-createTask("Математика", "Сложение чисел", "Средний", "4 + 7 = ?", "Подумай", "11")
-createTask("Математика", "Сложение чисел", "Средний", "13 + 17 = ?", "Подумай", "30")
-createTask("Математика", "Сложение чисел", "Сложный", "102 + 236 = ?", "Подумай", "338")
-createTask("Математика", "Вычитание чисел", "Средний", "77 - 35 = ?", "Подумай", "42")
+
+createTask("Математика", "Сложение чисел", "Простой", "2 + 2 = ?", "Посчитай по пальцам", "4", "Открой калькулятор")
+createTask("Математика", "Сложение чисел", "Простой", "2 + 3 = ?", "Посчитай по пальцам", "5", "Открой калькулятор")
+createTask("Математика", "Сложение чисел", "Средний", "4 + 7 = ?", "Подумай", "11", "Открой калькулятор")
+createTask("Математика", "Сложение чисел", "Средний", "13 + 17 = ?", "Подумай", "30", "Открой калькулятор")
+createTask("Математика", "Сложение чисел", "Сложный", "102 + 236 = ?", "Подумай", "338", "Открой калькулятор")
+createTask("Математика", "Вычитание чисел", "Средний", "77 - 35 = ?", "Подумай", "42", "Открой калькулятор")
 
 
 if not Task.table_exists():
     Task.create_table()
-    createTask("Математика", "Сложение чисел", "Простой", "2 + 2 = ?", "Посчитай по пальцам", "4")
-    createTask("Математика", "Сложение чисел", "Простой", "2 + 3 = ?", "Посчитай по пальцам", "5")
-    createTask("Математика", "Сложение чисел", "Средний", "4 + 7 = ?", "Подумай", "11")
-    createTask("Математика", "Сложение чисел", "Средний", "13 + 17 = ?", "Подумай", "30")
-    createTask("Математика", "Сложение чисел", "Сложный", "102 + 236 = ?", "Подумай", "338")
-    createTask("Математика", "Вычитание чисел", "Средний", "77 - 35 = ?", "Подумай", "42")
+    createTask("Математика", "Сложение чисел", "Простой", "2 + 2 = ?", "Посчитай по пальцам", "4", "Открой калькулятор")
+    createTask("Математика", "Сложение чисел", "Простой", "2 + 3 = ?", "Посчитай по пальцам", "5", "Открой калькулятор")
+    createTask("Математика", "Сложение чисел", "Средний", "4 + 7 = ?", "Подумай", "11", "Открой калькулятор")
+    createTask("Математика", "Сложение чисел", "Средний", "13 + 17 = ?", "Подумай", "30", "Открой калькулятор")
+    createTask("Математика", "Сложение чисел", "Сложный", "102 + 236 = ?", "Подумай", "338", "Открой калькулятор")
+    createTask("Математика", "Вычитание чисел", "Средний", "77 - 35 = ?", "Подумай", "42", "Открой калькулятор")
     print("Table 'Task' created")

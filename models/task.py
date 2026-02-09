@@ -8,6 +8,7 @@ class Task(BaseModel):
     solution = CharField(default="")
     hint = CharField(default="")
     answer = CharField()
+    explanation = CharField(default="")
     difficulty = CharField(default="")
     subject = CharField(default="")
     topic = CharField(default="")
