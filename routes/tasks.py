@@ -10,7 +10,7 @@ def new_task():
     data = request.json
     status = isAdmin(data["username"], data["password"])
     if status == "ok":
-        createTask(data["subject"], data["topic"], data["difficulty"], data["description"], data["hint"], data["answer"])
+        createTask(data["subject"], data["topic"], data["difficulty"], data["description"], data["hint"], data["answer"], data["explanation"])
     return jsonify({"status": status})
 
 
@@ -31,8 +31,17 @@ def get_tasks():
         return jsonify({"status": status, 
                         "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
                         "topics": getTopics(),
-                        "totalPages": countTasksPages(data.get("selectedTopics"), data.get("selectedDifficulties"))})
-    return jsonify({"status": "wrong_credentials"})
+                        "totalPages": countTasksPages()})
+    return jsonify({"status": status})
+
+
+@tasks_bp.route("/editTask", methods=["POST"])
+def edit_task():
+    data = request.json
+    status = isAdmin(data["username"], data["password"])
+    if status == "ok":
+        editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskExplanation"], data["taskTopic"])
+    return jsonify({"status": status})
 
 
 @tasks_bp.route('/upload', methods=['POST'])
@@ -46,7 +55,7 @@ def upload_task():
         return jsonify({"error": f"Ошибка парсинга JSON: {str(e)}"}), 400
     
     REQUIRED_FIELDS = [
-        'description', 'hint', 'answer',
+        'description', 'hint', 'answer', 'explanation'
         'difficulty', 'subject', 'topic'
     ]
     
@@ -63,6 +72,7 @@ def upload_task():
             description=data['description'],
             hint=data['hint'],
             answer=data['answer'],
+            explanation=data['explanation'],
             difficulty=data['difficulty'],
             subject=data['subject'],
             topic=data['topic']
