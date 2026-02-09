@@ -90,6 +90,8 @@ duels = {}
 userQueue: list[UserInQueue] = []
 
 
+  
+
 def calculateRatings(ratingA, ratingB, score):
   DENOMINATOR = 400
   K = 32
@@ -222,6 +224,16 @@ def handle_duel(duelName, data):
         if duel.player1.ready and duel.player2.ready:
             start_new_round(duelName)
 
+
+
+@socketio.on("leave_queue")
+def leave_queue(username):
+  for userInQueue in userQueue:
+    if userInQueue.userObj.name == username:
+        userQueue.remove(userInQueue)
+        print(userQueue)
+        return
+    
 @socketio.on("matchmaking")
 def handle_matchmaking(username):
     user = getUser(username)
