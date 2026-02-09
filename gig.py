@@ -90,8 +90,8 @@ def generate_task():
   "difficulty": "Простой/Средний/Сложный",
   "description": "текст задачи",
   "hint": "подсказка",
-  "answer": "ответ",
-  "explanation": "объяснение"
+  "answer": "ответ(ответ должен быть числом)",
+  "explanation": "объяснение" (должно содержать ответ)
 }"""
         
         headers = {
