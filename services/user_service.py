@@ -85,6 +85,17 @@ def getProfile(name):
         "ratingChanges": rating_changes
     }
 
+
+def updateUserRating(username, new_rating):
+    try:
+        user = User.get(User.name == username)
+        user.rating = new_rating
+        user.save()
+        return True
+    except User.DoesNotExist:
+        return False
+    
+
 if not User.table_exists():
     User.create_table()
     print("Table 'User' created")

@@ -31,7 +31,7 @@ def get_tasks():
         return jsonify({"status": status, 
                         "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
                         "topics": getTopics(),
-                        "totalPages": countTasksPages()})
+                        "totalPages": countTasksPages(data.get("selectedTopics"), data.get("selectedDifficulties"))})
     return jsonify({"status": status})
 
 
