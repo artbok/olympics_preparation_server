@@ -2,11 +2,14 @@ from flask import Flask
 from routes.users import users_bp
 from routes.tasks import tasks_bp
 from routes.duels import duels_bp, socketio 
+from gig import gig_bp
 
 app = Flask(__name__)
 app.register_blueprint(users_bp)
 app.register_blueprint(tasks_bp)
 app.register_blueprint(duels_bp)
+app.register_blueprint(gig_bp)
+
 
 socketio.init_app(app)
 
