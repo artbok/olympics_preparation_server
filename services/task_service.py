@@ -45,7 +45,7 @@ def getTopics():
 
 def countTasksPages():
     return ceil(Task.select().count() / 10)
-print(getTopics())
+
 
 if not Task.table_exists():
     Task.create_table()

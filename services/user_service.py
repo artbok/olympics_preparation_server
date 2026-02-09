@@ -63,16 +63,26 @@ def updateRating(name, deltaRating):
 def getProfile(name):
     user: User = getUser(name)
     if not user:
-        return None
-    
+        return {"error": "User not found"}
+
+    rating_changes = []
+    if user.ratingChanges:
+        rating_changes_str = str(user.ratingChanges).strip()
+        if rating_changes_str:
+            parts = rating_changes_str.split('/')
+            rating_changes = [
+                int(part.strip()) 
+                for part in parts
+            ]
+
     return {
-        "rating": user.rating,
-        "username": user.name,
-        "rightsLevel": user.rightsLevel,
-        "totalTime": user.totalTime,
-        "solvedCorrectly": user.solvedCorrectly,
-        "solvedIncorrectly": user.solvedIncorrectly,
-        "ratingChanges": list(map(int, user.ratingChanges.split('/')))
+        "rating": int(user.rating) if user.rating else 0,
+        "username": str(user.name),
+        "rightsLevel": int(user.rightsLevel) if user.rightsLevel else 0,
+        "totalTime": int(user.totalTime) if user.totalTime else 0,
+        "solvedCorrectly": int(user.solvedCorrectly) if user.solvedCorrectly else 0,
+        "solvedIncorrectly": int(user.solvedIncorrectly) if user.solvedIncorrectly else 0,
+        "ratingChanges": rating_changes
     }
 
 if not User.table_exists():
