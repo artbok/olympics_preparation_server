@@ -50,6 +50,30 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
+def updateRating(name, deltaRating):
+    user: User = getUser(name)
+    user.rating += deltaRating
+    
+    ratingChangesList = list(map(int, user.ratingChanges.split('/')))
+    ratingChangesList.append(deltaRating)
+    user.ratingChanges = '/'.join(map(str, ratingChangesList))
+    user.save()
+    return user.ratingChanges
+
+def getProfile(name):
+    user: User = getUser(name)
+    if not user:
+        return None
+    
+    return {
+        "rating": user.rating,
+        "username": user.name,
+        "rightsLevel": user.rightsLevel,
+        "totalTime": user.totalTime,
+        "solvedCorrectly": user.solvedCorrectly,
+        "solvedIncorrectly": user.solvedIncorrectly,
+        "ratingChanges": list(map(int, user.ratingChanges.split('/')))
+    }
 
 if not User.table_exists():
     User.create_table()
