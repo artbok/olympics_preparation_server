@@ -76,11 +76,11 @@ class Duel:
         difficulty = self.tasks[self.index].difficulty
         
         if difficulty == "Простой":
-            score = max(min((300 - dif) * 4, 1000), 500)
+            score = max(min((60 - dif) * 20, 1000), 500)
         elif difficulty == "Средний":
-            score = max(min((450 - dif) * 4, 1500), 750)
+            score = max(min((90 - dif) * 20, 1500), 750)
         elif difficulty == "Сложный":
-            score = max(min((600 - dif) * 4, 2000), 1000)
+            score = max(min((120 - dif) * 20, 2000), 1000)
             
         player.scores[self.index] = int(score)
         player.total_score += int(score)
