@@ -34,9 +34,15 @@ def getTopics():
     return data
 
 
-def countTasksPages():
-    return ceil(Task.select().count() / 10)
-print(getTopics())
+def countTasksPages(selectedTopics, selectedDifficulties):
+    filters = []
+    if selectedTopics and len(selectedTopics) > 0:
+        filters.append(Task.topic << selectedTopics)
+    if selectedDifficulties and len(selectedDifficulties) > 0:
+        filters.append(Task.difficulty << selectedDifficulties)
+    return ceil(Task.select().where(*filters).count() / 10)
+
+
 
 if not Task.table_exists():
     Task.create_table()
@@ -47,13 +53,6 @@ TO BE ADDED
       subject, topic, difficulty, description - optional filters
     returns List<Task>
 """
-createTask("Математика", "Сложение чисел", "Простой", "2 + 2 = ?", "Посчитай по пальцам", "4")
-createTask("Математика", "Сложение чисел", "Простой", "2 + 3 = ?", "Посчитай по пальцам", "5")
-createTask("Математика", "Сложение чисел", "Средний", "4 + 7 = ?", "Подумай", "11")
-createTask("Математика", "Сложение чисел", "Средний", "13 + 17 = ?", "Подумай", "30")
-createTask("Математика", "Сложение чисел", "Сложный", "102 + 236 = ?", "Подумай", "338")
-createTask("Математика", "Вычитание чисел", "Средний", "77 - 35 = ?", "Подумай", "42")
-
 
 if not Task.table_exists():
     Task.create_table()
