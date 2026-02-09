@@ -11,6 +11,15 @@ def deleteTask(taskId):
     task: Task = Task.get(taskId)
     task.delete_instance()
 
+def editTask(taskId, taskDescription, taskSubject, taskDifficulty, taskHint, taskAnswer, taskTopic):
+    task: Task = Task.get(taskId)
+    task.description = taskDescription
+    task.subject = taskSubject
+    task.difficulty = taskDifficulty
+    task.hint = taskHint
+    task.answer = taskAnswer
+    task.topic = taskTopic
+    task.save()
 
 
 def getTasks(page, selectedTopics, selectedDifficulties) -> list[map]:

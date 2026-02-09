@@ -87,7 +87,7 @@ def eloDiffrence(user1: User, user2: User):
 
 
 def match_found(player1: User, player2: User):
-    duelName = f"Duel{datetime.now().strftime(f"%d-%m-%yT%H:%M:%S:%f|{secrets.token_urlsafe(32)}")}"
+    #duelName = f"Duel{datetime.now().strftime(f"%d-%m-%yT%H:%M:%S:%f|{secrets.token_urlsafe(32)}")}"
     duels[duelName] = Duel(duelName, player1, player2)
     join_room(duelName)
     socketio.emit(f"matchmaking_{player1.name}", {"code": "match_found", "duelName": duelName, "opponent": {"name": player2.name, "rating": player2.rating}})

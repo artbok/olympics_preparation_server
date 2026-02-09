@@ -32,7 +32,16 @@ def get_tasks():
                         "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
                         "topics": getTopics(),
                         "totalPages": countTasksPages()})
-    return jsonify({"status": "wrong_credentials"})
+    return jsonify({"status": status})
+
+
+@tasks_bp.route("/editTask", methods=["POST"])
+def edit_task():
+    data = request.json
+    status = isAdmin(data["username"], data["password"])
+    if status == "ok":
+        editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskTopic"])
+    return jsonify({"status": status})
 
 
 @tasks_bp.route('/upload', methods=['POST'])
