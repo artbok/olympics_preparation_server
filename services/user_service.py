@@ -50,6 +50,51 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
+def updateRating(name, deltaRating):
+    user: User = getUser(name)
+    user.rating += deltaRating
+    
+    ratingChangesList = list(map(int, user.ratingChanges.split('/')))
+    ratingChangesList.append(deltaRating)
+    user.ratingChanges = '/'.join(map(str, ratingChangesList))
+    user.save()
+    return user.ratingChanges
+
+def getProfile(name):
+    user: User = getUser(name)
+    if not user:
+        return {"error": "User not found"}
+
+    rating_changes = []
+    if user.ratingChanges:
+        rating_changes_str = str(user.ratingChanges).strip()
+        if rating_changes_str:
+            parts = rating_changes_str.split('/')
+            rating_changes = [
+                int(part.strip()) 
+                for part in parts
+            ]
+
+    return {
+        "rating": int(user.rating) if user.rating else 0,
+        "username": str(user.name),
+        "rightsLevel": int(user.rightsLevel) if user.rightsLevel else 0,
+        "totalTime": int(user.totalTime) if user.totalTime else 0,
+        "solvedCorrectly": int(user.solvedCorrectly) if user.solvedCorrectly else 0,
+        "solvedIncorrectly": int(user.solvedIncorrectly) if user.solvedIncorrectly else 0,
+        "ratingChanges": rating_changes
+    }
+
+
+def updateUserRating(username, new_rating):
+    try:
+        user = User.get(User.name == username)
+        user.rating = new_rating
+        user.save()
+        return True
+    except User.DoesNotExist:
+        return False
+    
 
 if not User.table_exists():
     User.create_table()
