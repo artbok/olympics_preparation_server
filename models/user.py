@@ -10,6 +10,4 @@ class User(BaseModel):
     rating = IntegerField(default=1000)
     totalTimeInDuels = IntegerField(default=0)
     duelAnswers = IntegerField(default=0)
-    solvedCorrectly = IntegerField(default=0)
-    solvedIncorrectly = IntegerField(default=0)
     ratingChanges = TextField(default="0")

@@ -10,6 +10,13 @@ def getTaskActivity(taskId, userId) -> TaskActivity:
 def createTaskActivity(taskId, userId, status):
     TaskActivity.create(taskId = taskId, userId = userId, status = status)
 
+def countCorrect(userId):
+    return len(TaskActivity.select().where(TaskActivity.userId == userId, TaskActivity.status == "correct"))
+
+
+def countIncorrect(userId):
+    return len(TaskActivity.select().where(TaskActivity.userId == userId, TaskActivity.status == "incorrect"))
+
 
 def bindTaskWithUser(taskId, userId, status):
     taskActivity: TaskActivity = getTaskActivity(taskId, userId)
