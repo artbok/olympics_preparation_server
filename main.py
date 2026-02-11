@@ -2,7 +2,7 @@ from flask import Flask
 from routes.users import users_bp
 from routes.tasks import tasks_bp
 from routes.duels import duels_bp, socketio 
-from gig import gig_bp
+from routes.gig import gig_bp
 from routes.admin import admin_stats_bp
 
 app = Flask(__name__)

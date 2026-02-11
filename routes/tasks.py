@@ -55,7 +55,7 @@ def upload_task():
         return jsonify({"error": f"Ошибка парсинга JSON: {str(e)}"}), 400
     
     REQUIRED_FIELDS = [
-        'description', 'hint', 'answer', 'explanation'
+        'description', 'hint', 'answer', 'explanation',
         'difficulty', 'subject', 'topic'
     ]
     
