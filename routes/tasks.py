@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.task_service import * 
 from services.user_service import *
-
+from services.task_activity_service import bindTaskWithUser
 
 tasks_bp = Blueprint("tasks", __name__)
 
@@ -41,6 +41,15 @@ def edit_task():
     status = isAdmin(data["username"], data["password"])
     if status == "ok":
         editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskExplanation"], data["taskTopic"])
+    return jsonify({"status": status})
+
+
+@tasks_bp.route("/updateStatus", methods=["POST"])
+def update_status():
+    data = request.json
+    status = isUser(data["username"], data["password"])
+    if status == "ok":
+        bindTaskWithUser(data["taskId"], getUser(data["username"].id))
     return jsonify({"status": status})
 
 
