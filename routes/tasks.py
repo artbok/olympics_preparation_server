@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.task_service import * 
 from services.user_service import *
-
+from services.task_activity_service import bindTaskWithUser
 
 tasks_bp = Blueprint("tasks", __name__)
 
@@ -44,51 +44,79 @@ def edit_task():
     return jsonify({"status": status})
 
 
+@tasks_bp.route("/updateStatus", methods=["POST"])
+def update_status():
+    data = request.json
+    status = isUser(data["username"], data["password"])
+    if status == "ok":
+        bindTaskWithUser(data["taskId"], getUser(data["username"].id))
+    return jsonify({"status": status})
+
+
 @tasks_bp.route('/upload', methods=['POST'])
 def upload_task():
     if not request.is_json:
         return jsonify({"error": "Требуется JSON (Content-Type: application/json)"}), 400
     
-    try:
-        data = request.get_json()
-    except Exception as e:
-        return jsonify({"error": f"Ошибка парсинга JSON: {str(e)}"}), 400
-    
+    data = request.get_json()
+    if isinstance(data, dict):
+        tasks_list = [data]
+    elif isinstance(data, list):
+        tasks_list = data
+    else:
+        return jsonify({"error": "Тело запроса должно быть объектом задачи или массивом задач"}), 400
+
+    if not tasks_list:
+        return jsonify({"error": "Список задач не может быть пустым"}), 400
+
     REQUIRED_FIELDS = [
         'description', 'hint', 'answer', 'explanation',
         'difficulty', 'subject', 'topic'
     ]
     
+    results = []
+    success_count = 0
 
-    missing = [field for field in REQUIRED_FIELDS if field not in data]
-    if missing:
-        return jsonify({
-            "error": f"Отсутствуют обязательные поля: {', '.join(missing)}",
-            "required_fields": REQUIRED_FIELDS
-        }), 400
-        
-    try:
+    for idx, task_data in enumerate(tasks_list):
+        if not isinstance(task_data, dict):
+            results.append({
+                "index": idx,
+                "status": "error",
+                "error": "Элемент должен быть объектом задачи"
+            })
+            continue
+
+        missing = [field for field in REQUIRED_FIELDS if field not in task_data]
+        if missing:
+            results.append({
+                "index": idx,
+                "status": "error",
+                "error": f"Отсутствуют поля: {', '.join(missing)}"
+            })
+            continue
+
         task_id = createTask(
-            description=data['description'],
-            hint=data['hint'],
-            answer=data['answer'],
-            explanation=data['explanation'],
-            difficulty=data['difficulty'],
-            subject=data['subject'],
-            topic=data['topic']
+            description=task_data['description'],
+            hint=task_data['hint'],
+            answer=task_data['answer'],
+            explanation=task_data['explanation'],
+            difficulty=task_data['difficulty'],
+            subject=task_data['subject'],
+            topic=task_data['topic']
         )
-        
-        return jsonify({
-            "success": True,
-            "message": "Задача успешно добавлена",
-            "task_id": task_id
-        }), 201
+        results.append({
+            "index": idx,
+            "status": "success",
+            "task_id": task_id,
+            "message": "Задача успешно добавлена"
+        })
+        success_count += 1
+
+
+    response_data = {
+        "total": len(tasks_list),
+        "success_count": success_count,
+        "results": results
+    }
     
-    except Exception as e:
-        print(f"[SERVER ERROR] createTask failed: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({
-            "error": "Ошибка при сохранении задачи",
-            "details": str(e) if tasks_bp.debug else None
-        }), 500
+    return jsonify(response_data), 200

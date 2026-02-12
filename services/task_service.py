@@ -2,9 +2,10 @@ from peewee import *
 from models.task import Task
 from playhouse.shortcuts import model_to_dict
 from math import ceil
+from services.task_activity_service import getTaskActivity
 
 def createTask(subject, topic, difficulty, description, hint, answer, explanation):
-    Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer, explanation = explanation)
+    return Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer, explanation = explanation)
     
 
 def deleteTask(taskId):
@@ -23,7 +24,7 @@ def editTask(taskId, taskDescription, taskSubject, taskDifficulty, taskHint, tas
     task.save()
 
 
-def getTasks(page, selectedTopics, selectedDifficulties) -> list[map]:
+def getTasks(page, selectedTopics, selectedDifficulties, userId=None) -> list[map]:
     tasks = []
     filters = []
     if selectedTopics and len(selectedTopics) > 0:
@@ -32,7 +33,15 @@ def getTasks(page, selectedTopics, selectedDifficulties) -> list[map]:
         filters.append(Task.difficulty << selectedDifficulties)
     query = Task.select().where(*filters).paginate(page, 10) if len(filters) > 0 else Task.select().paginate(page, 10)
     for task in query:
-        tasks.append(model_to_dict(task))
+        d = model_to_dict(task)
+        if userId:
+            taskActivity = getTaskActivity(task.id, userId)
+            if taskActivity != None:
+                if taskActivity.status == "correct":
+                    d["status"] = "Решено правильно"
+                else:
+                    d["status"] = "Решено неправильно"
+        tasks.append(d)
     return tasks
 
 

@@ -1,9 +1,8 @@
 from peewee import *
 from models.base_model import BaseModel   
 
-class TaskActivities(BaseModel):
+class TaskActivity(BaseModel):
     id = AutoField()
     taskId = IntegerField()
     userId = IntegerField()
-    status = CharField(default="notSolved")
-    
+    status = CharField()

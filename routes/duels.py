@@ -84,6 +84,8 @@ class Duel:
             
         player.scores[self.index] = int(score)
         player.total_score += int(score)
+        player.userObj.duelAnswers += 1
+        player.userObj.totalTimeInDuels += dif
         return int(score)
 
 duels = {}

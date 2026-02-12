@@ -1,5 +1,6 @@
 from peewee import *
 from models.user import User
+from services.task_activity_service import countCorrect, countIncorrect
 import bcrypt
 
 
@@ -60,10 +61,8 @@ def updateRating(name, deltaRating):
     user.save()
     return user.ratingChanges
 
-def getProfile(name):
-    user: User = getUser(name)
-    if not user:
-        return {"error": "User not found"}
+def getProfile(username):
+    user: User = getUser(username)
 
     rating_changes = []
     if user.ratingChanges:
@@ -74,27 +73,32 @@ def getProfile(name):
                 int(part.strip()) 
                 for part in parts
             ]
-
+    averageAnswerTime = round(user.totalTimeInDuels / user.duelAnswers, 2)
+    solvedCorrectly = countCorrect(user.id)
+    solvedIncorrectly = countIncorrect(user.id)
     return {
         "rating": int(user.rating) if user.rating else 0,
         "username": str(user.name),
         "rightsLevel": int(user.rightsLevel) if user.rightsLevel else 0,
-        "totalTime": int(user.totalTime) if user.totalTime else 0,
-        "solvedCorrectly": int(user.solvedCorrectly) if user.solvedCorrectly else 0,
-        "solvedIncorrectly": int(user.solvedIncorrectly) if user.solvedIncorrectly else 0,
+        "averageAnswerTime": averageAnswerTime,
+        "solvedCorrectly": solvedCorrectly,
+        "solvedIncorrectly": solvedIncorrectly,
         "ratingChanges": rating_changes
     }
 
 
 def updateUserRating(username, new_rating):
-    try:
-        user = User.get(User.name == username)
-        user.rating = new_rating
-        user.save()
-        return True
-    except User.DoesNotExist:
-        return False
-    
+    user = User.get(User.name == username)
+    delta = new_rating - user.rating
+    user.rating = new_rating
+    if user.ratingChanges:
+        user.ratingChanges = f"{user.ratingChanges}/{delta}"
+    else:
+        user.ratingChanges = str(delta)
+        
+    user.save()
+    return True
+
 
 if not User.table_exists():
     User.create_table()
