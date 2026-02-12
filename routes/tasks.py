@@ -95,7 +95,7 @@ def upload_task():
             })
             continue
 
-        task_id = createTask(
+        task = createTask(
             description=task_data['description'],
             hint=task_data['hint'],
             answer=task_data['answer'],
@@ -107,7 +107,7 @@ def upload_task():
         results.append({
             "index": idx,
             "status": "success",
-            "task_id": task_id,
+            "task_id": task.id,
             "message": "Задача успешно добавлена"
         })
         success_count += 1
