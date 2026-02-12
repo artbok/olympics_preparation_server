@@ -3,15 +3,12 @@ import logging
 from datetime import datetime
 import requests
 import json
-import re
 
 logger = logging.getLogger(__name__)
 
 
 class GigaChatAuthManager:
-    def __init__(self, client_id, client_secret):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self):
         self.access_token = None
         self.expires_at = None 
         self.lock = threading.Lock()
@@ -52,6 +49,7 @@ class GigaChatAuthManager:
             return self.access_token
 
 
+
 class GigaChatService:
     def __init__(self, auth_manager):
         self.auth_manager = auth_manager
@@ -59,18 +57,7 @@ class GigaChatService:
     def generate_task(self, prompt):
         token = self.auth_manager.get_valid_token()
         
-        system_prompt = """Ты — генератор учебных задач. Сгенерируй ОДНУ задачу строго в формате JSON.
-Формат:
-{
-  "subject": "название предмета",
-  "topic": "тема",
-  "difficulty": "Простой/Средний/Сложный",
-  "description": "текст задачи",
-  "hint": "подсказка",
-  "answer": "ответ (должно быть только одно число в виде строки)",
-  "explanation": "объяснение"
-}"""
-        
+        system_prompt = open("prompt.txt", "r", encoding="utf-8").read()
         headers = {
             'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json'
