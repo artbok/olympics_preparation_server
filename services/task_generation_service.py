@@ -39,10 +39,9 @@ class GigaChatAuthManager:
         return datetime.now() < self.expires_at
     
     def get_valid_token(self):
-        with self.lock:
-            if not self.is_token_valid():
-                self.get_token()
-            return self.access_token
+        if not self.is_token_valid():
+            self.get_token()
+        return self.access_token
 
 
 auth_manager = GigaChatAuthManager(
@@ -54,8 +53,19 @@ def sendToGigachat(prompt):
     
     token = auth_manager.get_valid_token()
     
-    system_prompt = open()
-    
+    system_prompt = """Ты — генератор учебных задач. Сгенерируй ОДНУ задачу строго в формате JSON.
+Формат:
+{
+"subject": "название предмета",
+"topic": "тема",
+"difficulty": "Простой/Средний/Сложный",
+"description": "текст задачи",
+"hint": "подсказка",
+"answer": "ответ(ответ должен быть числом)",
+"explanation": "объяснение (должно содержать ответ)"
+}
+"""
+    print(system_prompt)
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
@@ -79,10 +89,10 @@ def sendToGigachat(prompt):
     
     result = response.json()
     content = result['choices'][0]['message']['content']
-    
-    start = content.find('{')
-    end = content.rfind('}') + 1
-    task_json = json.loads(content[start:end])
+    start_idx = content.find('{')
+    end_idx = content.rfind('}') + 1
+    if start_idx == -1: raise ValueError("JSON not found")
+    task_json = json.loads(content[start_idx:end_idx])
 
     new_task = createTask(
         task_json.get('subject', 'Сгенерировано'),
