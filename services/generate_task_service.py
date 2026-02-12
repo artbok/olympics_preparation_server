@@ -3,9 +3,9 @@ import logging
 from datetime import datetime
 import requests
 import json
+import urllib3
 
-logger = logging.getLogger(__name__)
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class GigaChatAuthManager:
     def __init__(self):
@@ -32,8 +32,6 @@ class GigaChatAuthManager:
         self.access_token = data['access_token']
         expires_timestamp = data["expires_at"] / 1000
         self.expires_at = datetime.fromtimestamp(expires_timestamp)
-        
-        logger.info(f"Token обновлен до: {self.expires_at}")
         return self.access_token
     
     def is_token_valid(self):
@@ -44,7 +42,6 @@ class GigaChatAuthManager:
     def get_valid_token(self):
         with self.lock:
             if not self.is_token_valid():
-                logger.info("Обновление токена...")
                 self.get_token()
             return self.access_token
 

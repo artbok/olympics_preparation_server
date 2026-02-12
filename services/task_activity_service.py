@@ -1,8 +1,5 @@
 from models.taskActivities import TaskActivity
 from models.user import User
-from services.user_service import getUser
-
-
 
 def getTaskActivity(taskId, userId) -> TaskActivity:
     return TaskActivity.get_or_none(TaskActivity.taskId == taskId, TaskActivity.userId == userId)
