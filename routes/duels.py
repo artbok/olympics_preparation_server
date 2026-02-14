@@ -5,6 +5,7 @@ import secrets
 from peewee import fn
 
 from services.user_service import getUser, updateUserRating
+from services.duel_service import createDuel
 from models.user import User
 from models.task import Task
 
@@ -136,7 +137,7 @@ def finish_game(duelName):
         "scores": {p1.username: p1.total_score, p2.username: p2.total_score},
         "ratings": {p1.username: new_r1, p2.username: new_r2}
     })
-    
+    createDuel(p1.username, p2.username, p1.total_score, p2.total_score, new_r1, new_r2)
     del duels[duelName]
 
 def start_new_round(duelName):
