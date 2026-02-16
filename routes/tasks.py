@@ -43,6 +43,14 @@ def edit_task():
         editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskExplanation"], data["taskTopic"])
     return jsonify({"status": status})
 
+@tasks_bp.route("/editTaskActivitiesCorrect", methods=["POST"])
+def edit_task_activities_correct():
+    data = request.json
+    status = isUser(data["username"], data["password"])
+    user =  getUser(data["username"])
+    if status == "ok":
+        editTaskActivitiesCorrect(data["taskId"], user.id)
+    return jsonify({"status": status})
 
 @tasks_bp.route("/updateStatus", methods=["POST"])
 def update_status():
@@ -51,7 +59,6 @@ def update_status():
     if status == "ok":
         bindTaskWithUser(data["taskId"], getUser(data["username"].id))
     return jsonify({"status": status})
-
 
 @tasks_bp.route('/upload', methods=['POST'])
 def upload_task():

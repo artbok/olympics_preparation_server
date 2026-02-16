@@ -21,6 +21,7 @@ def bindTaskWithUser(taskId, userId, status):
     else:
         if status == "correct":
             taskActivity.status = status
+            taskActivity.save()
     
     
 if not TaskActivity.table_exists():
