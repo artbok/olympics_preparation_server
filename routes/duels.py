@@ -87,6 +87,7 @@ class Game:
         player.total_score += int(score)
         player.userObj.duelAnswers += 1
         player.userObj.totalTimeInDuels += dif
+        player.userObj.save()
         return int(score)
     
 duels = {}
