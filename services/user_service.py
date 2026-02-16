@@ -23,6 +23,14 @@ def createUser(username, password, rightsLevel):
     User.create(name = username, password = hashed_password, rightsLevel = rightsLevel)
     return "ok"
 
+def editUser(editUserName):
+    user: User = User.get_or_none(User.name == editUserName)
+    user.rightsLevel = 2
+    user.save()
+
+def deleteUser(deleteUserName):
+    user: User = User.get_or_none(User.name == deleteUserName)
+    user.delete_instance()
 
 def getUser(username) -> User:
     return User.get_or_none(User.name == username)

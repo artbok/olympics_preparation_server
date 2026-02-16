@@ -18,6 +18,21 @@ def new_user():
     status = createUser(data["username"], data["password"], data["rightsLevel"])
     return jsonify({'status': status})
 
+@users_bp.route('/editUser', methods=['POST'])
+def edit_user():
+    data = request.json
+    status = isAdmin(data["username"], data["password"])
+    if status == "ok":
+        editUser(data["editUserName"])
+    return jsonify({"status": status})
+
+@users_bp.route('/deleteUser', methods=['POST'])
+def delete_user():
+    data = request.json
+    status = isAdmin(data["username"], data["password"])
+    if status == "ok":
+        deleteUser(data["deleteUserName"])
+    return jsonify({"status": status})
 
 @users_bp.route('/authUser', methods=['POST'])
 def auth_user():
