@@ -22,8 +22,8 @@ def get_all_users_stats():
             stats.append({
                 "username": user.name,
                 "rating": user.rating,
-                "solved_correctly": user.solvedCorrectly,
-                "solved_total": user.solvedCorrectly + user.solvedIncorrectly
+                "solved_correctly": countCorrect(user.id),
+                "solved_total": countCorrect(user.id) + countIncorrect(user.id)
             })
         }
     return stats
