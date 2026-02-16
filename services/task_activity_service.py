@@ -25,15 +25,19 @@ def bindTaskWithUser(taskId, userId, status):
             taskActivity.status = status
             taskActivity.save()
     
-
-def getUserSolvedTasksForSubject(selectedTopics, selectedDifficulties, userId):
+def getUserSolvedTasksForSubject(selectedTopics, selectedSubjects, userId):
     filters = []
+    
     if selectedTopics and len(selectedTopics) > 0:
         filters.append(Task.topic << selectedTopics)
-    if selectedDifficulties and len(selectedDifficulties) > 0:
-        filters.append(Task.difficulty << selectedDifficulties)
     
-    query = Task.select().where(*filters) if filters else Task.select()
+    if selectedSubjects and len(selectedSubjects) > 0:
+        filters.append(Task.subject << selectedSubjects)
+    
+    if filters:
+        query = Task.select().where(*filters)
+    else:
+        query = Task.select()
     
     solved = 0
     unsolved = 0
@@ -46,6 +50,64 @@ def getUserSolvedTasksForSubject(selectedTopics, selectedDifficulties, userId):
             unsolved += 1
     
     return {"solved": solved, "unsolved": unsolved}
+
+
+def getUserTopicsStats(username):
+    """
+    {
+        "subject1": {
+            "topic1": {"solved": , "total": },
+            "topic2": {"solved": , "total": }
+        }
+    }
+    """
+    user = User.get_or_none(User.name == username)
+    if not user:
+        return {}
+    
+    subjects = Task.select(Task.subject).distinct().scalars()
+    subjects_list = list(subjects) if subjects else []
+    
+    data = {}
+    
+    for subject in subjects_list:
+        if not subject:
+            continue
+        
+        topics_query = Task.select(Task.topic).where(Task.subject == subject).distinct()
+        topics = list(topics_query.scalars())
+        
+        subject_data = {}
+        
+        for topic in topics:
+            if not topic:
+                continue
+            
+            total_tasks = Task.select().where(
+                (Task.subject == subject) & 
+                (Task.topic == topic)
+            ).count()
+            
+            solved_tasks = Task.select().join(
+                TaskActivity, on=(Task.id == TaskActivity.taskId)
+            ).where(
+                (Task.subject == subject) & 
+                (Task.topic == topic) &
+                (TaskActivity.userId == user.id) &
+                (TaskActivity.status == "correct")
+            ).count()
+            
+            
+            subject_data[topic] = {
+                "solved": solved_tasks,
+                "total": total_tasks
+            }
+        
+        if subject_data:
+            data[subject] = subject_data
+    
+    return data
+
 
 
 def getUserTopicsStats(username):
