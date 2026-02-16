@@ -353,7 +353,7 @@ def cancel_duel():
             user2.rating = old_rating
             user2.save()
     
-        duel.save()
+        duel.delete_instance()
         
         response_id = getattr(duel, 'id', getattr(duel, 'duel_id', duel_id))
         return jsonify({

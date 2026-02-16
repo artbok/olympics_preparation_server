@@ -9,4 +9,3 @@ class Duel(BaseModel):
     score2 = IntegerField()
     newRating1 = IntegerField()
     newRating2 = IntegerField()
-    
