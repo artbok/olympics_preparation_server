@@ -1,6 +1,6 @@
 from peewee import *
 from models.user import User
-from services.task_activity_service import countCorrect, countIncorrect
+from services.task_activities_service import countCorrect, countIncorrect
 import bcrypt
 
 
@@ -59,6 +59,7 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
+"""sumary_line
 def updateRating(name, deltaRating):
     user: User = getUser(name)
     user.rating += deltaRating
@@ -68,7 +69,7 @@ def updateRating(name, deltaRating):
     user.ratingChanges = '/'.join(map(str, ratingChangesList))
     user.save()
     return user.ratingChanges
-
+"""
 def getProfile(username):
     user: User = getUser(username)
     rating_changes = []
@@ -80,7 +81,11 @@ def getProfile(username):
                 int(part.strip()) 
                 for part in parts
             ]
-    averageAnswerTime = round(user.totalTimeInDuels / user.duelAnswers, 2)
+    if user.duelAnswers != 0:
+        averageAnswerTime = round(user.totalTimeInDuels / user.duelAnswers, 2)
+    else: 
+        averageAnswerTime = 0
+    
     solvedCorrectly = countCorrect(user.id)
     solvedIncorrectly = countIncorrect(user.id)
     return {

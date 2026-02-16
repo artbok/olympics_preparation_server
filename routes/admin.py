@@ -1,4 +1,3 @@
-# admin_stats.py
 from flask import Blueprint, request, jsonify, Response
 from services.user_service import isAdmin
 from services.admin_service import get_user_stats, get_all_users_stats
