@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.user_service import * 
-from services.task_activities_service import *
+from services.task_activity_service import *
 
 task_activities_bp = Blueprint("task_activities", __name__)
 
