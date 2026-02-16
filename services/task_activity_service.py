@@ -20,15 +20,9 @@ def bindTaskWithUser(taskId, userId, status):
     user: User = User.get_by_id(userId)
     if taskActivity == None:
         createTaskActivity(taskId, userId, status) 
-        if status == "correct":
-            user.solvedCorrectly += 1
-        elif status == "incorrect":
-            user.solvedIncorrectly += 1
     else:
         if status == "correct":
             taskActivity.status = status
-            user.solvedCorrectly += 1
-            user.solvedIncorrectly += 1
     
     
 if not TaskActivity.table_exists():
