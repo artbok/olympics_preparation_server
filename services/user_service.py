@@ -59,6 +59,7 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
+"""sumary_line
 def updateRating(name, deltaRating):
     user: User = getUser(name)
     user.rating += deltaRating
@@ -68,7 +69,7 @@ def updateRating(name, deltaRating):
     user.ratingChanges = '/'.join(map(str, ratingChangesList))
     user.save()
     return user.ratingChanges
-
+"""
 def getProfile(username):
     user: User = getUser(username)
     rating_changes = []
