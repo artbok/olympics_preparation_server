@@ -94,6 +94,13 @@ def upload_task():
                 "error": f"Отсутствуют поля: {', '.join(missing)}"
             })
             continue
+        if task_data["difficulty"] not in ["Простой", "Средний", "Сложный"]:
+            results.append({
+                "index": idx,
+                "status": "error",
+                "error": "Указана неправильная сложность"
+            })
+            continue
 
         task = createTask(
             description=task_data['description'],
