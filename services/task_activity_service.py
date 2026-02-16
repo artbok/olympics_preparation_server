@@ -1,5 +1,4 @@
 from models.taskActivities import TaskActivity
-from models.user import User
 
 def getTaskActivity(taskId, userId) -> TaskActivity:
     return TaskActivity.get_or_none(TaskActivity.taskId == taskId, TaskActivity.userId == userId)
@@ -17,7 +16,6 @@ def countIncorrect(userId):
 
 def bindTaskWithUser(taskId, userId, status):
     taskActivity: TaskActivity = getTaskActivity(taskId, userId)
-    user: User = User.get_by_id(userId)
     if taskActivity == None:
         createTaskActivity(taskId, userId, status) 
     else:
