@@ -27,9 +27,10 @@ def delete_task():
 def get_tasks():
     data = request.json
     status = isUser(data["username"], data["password"])
+    user = getUser(data["username"])
     if status == "ok":
         return jsonify({"status": status, 
-                        "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
+                        "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties"), user.id), 
                         "topics": getTopics(),
                         "totalPages": countTasksPages(data.get("selectedTopics"), data.get("selectedDifficulties"))})
     return jsonify({"status": status})
@@ -43,7 +44,14 @@ def edit_task():
         editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskExplanation"], data["taskTopic"])
     return jsonify({"status": status})
 
-
+@tasks_bp.route("/editTaskActivity", methods=["POST"])
+def edit_task_activity():
+    data = request.json
+    status = isUser(data["username"], data["password"])
+    user =  getUser(data["username"])
+    if status == "ok":
+        bindTaskWithUser(data["taskId"], user.id, data["status"],)
+    return jsonify({"status": status})
 
 
 @tasks_bp.route('/upload', methods=['POST'])
@@ -85,6 +93,13 @@ def upload_task():
                 "index": idx,
                 "status": "error",
                 "error": f"Отсутствуют поля: {', '.join(missing)}"
+            })
+            continue
+        if task_data["difficulty"] not in ["Простой", "Средний", "Сложный"]:
+            results.append({
+                "index": idx,
+                "status": "error",
+                "error": "Указана неправильная сложность"
             })
             continue
 

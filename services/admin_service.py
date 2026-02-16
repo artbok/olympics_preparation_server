@@ -1,5 +1,7 @@
 from models.user import User
 from services.user_service import getUser
+from services.task_activity_service import countCorrect, countIncorrect
+
 
 def get_user_stats(username):
     user = getUser(username)
@@ -9,8 +11,8 @@ def get_user_stats(username):
     return {
         "username": user.name,
         "rating": user.rating,
-        "solved_correctly": user.solvedCorrectly,
-        "solved_total": user.solvedCorrectly + user.solvedIncorrectly
+        "solved_correctly": countCorrect(user.id),
+        "solved_total": countCorrect(user.id) + countIncorrect(user.id)
     }
 
 def get_all_users_stats():
@@ -20,8 +22,8 @@ def get_all_users_stats():
             stats.append({
                 "username": user.name,
                 "rating": user.rating,
-                "solved_correctly": user.solvedCorrectly,
-                "solved_total": user.solvedCorrectly + user.solvedIncorrectly
+                "solved_correctly": countCorrect(user.id),
+                "solved_total": countCorrect(user.id) + countIncorrect(user.id)
             })
         }
     return stats
