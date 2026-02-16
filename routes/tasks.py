@@ -27,9 +27,10 @@ def delete_task():
 def get_tasks():
     data = request.json
     status = isUser(data["username"], data["password"])
+    user = getUser(data["username"])
     if status == "ok":
         return jsonify({"status": status, 
-                        "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties")), 
+                        "tasks": getTasks(data["page"], data.get("selectedTopics"), data.get("selectedDifficulties"), user.id), 
                         "topics": getTopics(),
                         "totalPages": countTasksPages(data.get("selectedTopics"), data.get("selectedDifficulties"))})
     return jsonify({"status": status})
@@ -43,13 +44,13 @@ def edit_task():
         editTask(data["taskId"], data["taskDescription"], data["taskSubject"], data["taskDifficulty"], data["taskHint"], data["taskAnswer"], data["taskExplanation"], data["taskTopic"])
     return jsonify({"status": status})
 
-@tasks_bp.route("/editTaskActivitiesCorrect", methods=["POST"])
-def edit_task_activities_correct():
+@tasks_bp.route("/editTaskActivity", methods=["POST"])
+def edit_task_activity():
     data = request.json
     status = isUser(data["username"], data["password"])
     user =  getUser(data["username"])
     if status == "ok":
-        editTaskActivitiesCorrect(data["taskId"], user.id)
+        bindTaskWithUser(data["taskId"], user.id, data["status"],)
     return jsonify({"status": status})
 
 @tasks_bp.route("/updateStatus", methods=["POST"])

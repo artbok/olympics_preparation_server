@@ -57,9 +57,6 @@ def getTopics():
     return data
 
 
-def editTaskActivitiesCorrect(taskId, userId):
-    bindTaskWithUser(taskId, userId, "correct")
-
 def countTasksPages(selectedTopics, selectedDifficulties):
     filters = []
     if selectedTopics and len(selectedTopics) > 0:
