@@ -1,6 +1,6 @@
 from models.user import User
 from services.user_service import getUser
-from services.task_activity_service import countCorrect, countIncorrect
+from services.task_activities_service import countCorrect, countIncorrect
 
 
 def get_user_stats(username):

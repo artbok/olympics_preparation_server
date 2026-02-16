@@ -6,17 +6,19 @@ from playhouse.shortcuts import model_to_dict
 def getTaskActivity(taskId, userId) -> TaskActivity:
     return TaskActivity.get_or_none(TaskActivity.taskId == taskId, TaskActivity.userId == userId)
 
-def getUserSolvedTasksForSubject(selectedTopics, selectedDifficulties, userId):
-    """
-    Подсчитывает количество решенных и нерешенных задач по заданным фильтрам
-    """
+def getUserSolvedTasksForSubject(selectedTopics, selectedSubjects, userId):
     filters = []
+    
     if selectedTopics and len(selectedTopics) > 0:
         filters.append(Task.topic << selectedTopics)
-    if selectedDifficulties and len(selectedDifficulties) > 0:
-        filters.append(Task.difficulty << selectedDifficulties)
     
-    query = Task.select().where(*filters) if filters else Task.select()
+    if selectedSubjects and len(selectedSubjects) > 0:
+        filters.append(Task.subject << selectedSubjects)
+    
+    if filters:
+        query = Task.select().where(*filters)
+    else:
+        query = Task.select()
     
     solved = 0
     unsolved = 0
@@ -35,8 +37,8 @@ def getUserTopicsStats(username):
     """
     {
         "subject1": {
-            "topic1": {"solved": X, "total": Y},
-            "topic2": {"solved": X, "total": Y}
+            "topic1": {"solved": , "total": },
+            "topic2": {"solved": , "total": }
         }
     }
     """
@@ -44,37 +46,50 @@ def getUserTopicsStats(username):
     if not user:
         return {}
     
-    subjects = Task.select(Task.subject).distinct().scalar()
-    if not isinstance(subjects, list):
-        subjects = [subjects] if subjects else []
+    subjects = Task.select(Task.subject).distinct().scalars()
+    subjects_list = list(subjects) if subjects else []
     
     data = {}
     
-    for subject in subjects:
+    for subject in subjects_list:
         if not subject:
             continue
-            
-        topics = Task.select(Task.topic).where(Task.subject == subject).distinct().scalar()
-        if not isinstance(topics, list):
-            topics = [topics] if topics else []
+        
+        topics_query = Task.select(Task.topic).where(Task.subject == subject).distinct()
+        topics = list(topics_query.scalars())
         
         subject_data = {}
         
         for topic in topics:
             if not topic:
                 continue
-                
-            stats = getUserSolvedTasksForSubject([topic], [subject], user.id)
+            
+            total_tasks = Task.select().where(
+                (Task.subject == subject) & 
+                (Task.topic == topic)
+            ).count()
+            
+            solved_tasks = Task.select().join(
+                TaskActivity, on=(Task.id == TaskActivity.taskId)
+            ).where(
+                (Task.subject == subject) & 
+                (Task.topic == topic) &
+                (TaskActivity.userId == user.id) &
+                (TaskActivity.status == "correct")
+            ).count()
+            
             
             subject_data[topic] = {
-                "solved": stats["solved"],
-                "total": stats["solved"] + stats["unsolved"]
+                "solved": solved_tasks,
+                "total": total_tasks
             }
         
         if subject_data:
             data[subject] = subject_data
     
     return data
+
+
 
 
 def createTaskActivity(taskId, userId, status):
@@ -90,22 +105,15 @@ def countIncorrect(userId):
 
 def bindTaskWithUser(taskId, userId, status):
     taskActivity: TaskActivity = getTaskActivity(taskId, userId)
-    user: User = User.get_by_id(userId)
     if taskActivity == None:
         createTaskActivity(taskId, userId, status) 
-        if status == "correct":
-            user.solvedCorrectly += 1
-        elif status == "incorrect":
-            user.solvedIncorrectly += 1
     else:
         if status == "correct":
             taskActivity.status = status
-            user.solvedCorrectly += 1
-            user.solvedIncorrectly += 1
+            taskActivity.save()
     
     
 if not TaskActivity.table_exists():
     TaskActivity.create_table()
-    print("Table 'TaskActivity' created")
 
     
