@@ -63,7 +63,6 @@ def updateRating(name, deltaRating):
 
 def getProfile(username):
     user: User = getUser(username)
-
     rating_changes = []
     if user.ratingChanges:
         rating_changes_str = str(user.ratingChanges).strip()

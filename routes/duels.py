@@ -234,7 +234,6 @@ def leave_queue(username):
   for userInQueue in userQueue:
     if userInQueue.userObj.name == username:
         userQueue.remove(userInQueue)
-        print(userQueue)
         return
     
 @socketio.on("matchmaking")
