@@ -63,7 +63,7 @@ def countTasksPages(selectedTopics, selectedDifficulties):
         filters.append(Task.topic << selectedTopics)
     if selectedDifficulties and len(selectedDifficulties) > 0:
         filters.append(Task.difficulty << selectedDifficulties)
-    return ceil(len(Task.select().where(*filters)) if len(filters) > 0 else len(Task.select()) / 10)
+    return ceil(len(Task.select().where(*filters))/10 if len(filters) > 0 else len(Task.select()) / 10)
 
 
 
