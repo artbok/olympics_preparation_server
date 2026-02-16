@@ -285,7 +285,7 @@ def cancel_duel():
             
         duel_id = data.get('duel_id')
         
-        duel = Duel.get_or_none(Duel.duel_id == duel_id)
+        duel: Duel = Duel.get_or_none(Duel.duel_id == duel_id)
    
         if not duel:
             return jsonify({'error': f'Дуэль с ID {duel_id} не найдена'}), 404
@@ -355,6 +355,7 @@ def cancel_duel():
         duel.save()
         
         response_id = getattr(duel, 'id', getattr(duel, 'duel_id', duel_id))
+        duel.delete_instance()
         return jsonify({
             'success': True,
             'message': f'Дуэль #{response_id} отменена. Рейтинги возвращены.',
