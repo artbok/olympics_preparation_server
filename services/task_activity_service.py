@@ -53,14 +53,6 @@ def getUserSolvedTasksForSubject(selectedTopics, selectedSubjects, userId):
 
 
 def getUserTopicsStats(username):
-    """
-    {
-        "subject1": {
-            "topic1": {"solved": , "total": },
-            "topic2": {"solved": , "total": }
-        }
-    }
-    """
     user = User.get_or_none(User.name == username)
     if not user:
         return {}
@@ -111,32 +103,16 @@ def getUserTopicsStats(username):
 
 
 def getUserTopicsStats(username):
-    """
-    {
-        "subject1": {
-            "topic1": {"solved": X, "total": Y},
-            "topic2": {"solved": X, "total": Y}
-        }
-    }
-    """
     user = User.get_or_none(User.name == username)
     if not user:
         return {}
     
-    subjects = Task.select(Task.subject).distinct().scalar()
-    if not isinstance(subjects, list):
-        subjects = [subjects] if subjects else []
-    
+    subjects = list(Task.select(Task.subject).distinct().order_by(Task.subject).scalars()) 
     data = {}
     
     for subject in subjects:
-        if not subject:
-            continue
             
-        topics = Task.select(Task.topic).where(Task.subject == subject).distinct().scalar()
-        if not isinstance(topics, list):
-            topics = [topics] if topics else []
-        
+        topics = list(Task.select(Task.topic).where(Task.subject == subject).distinct().scalars())
         subject_data = {}
         
         for topic in topics:

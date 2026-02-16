@@ -37,7 +37,7 @@ def getUser(username) -> User:
     return User.get_or_none(User.name == username)
 
 
-def isAdmin(username, password) -> str: #!!!!
+def isAdmin(username, password) -> str:
     user: User = getUser(username)
     if not user or not verify_password(password, user.password):
         return 'wrong_credentials'
@@ -59,17 +59,7 @@ def getUsers() -> list[User]:
         users.append(user.name)
     return users
 
-"""sumary_line
-def updateRating(name, deltaRating):
-    user: User = getUser(name)
-    user.rating += deltaRating
-    
-    ratingChangesList = list(map(int, user.ratingChanges.split('/')))
-    ratingChangesList.append(deltaRating)
-    user.ratingChanges = '/'.join(map(str, ratingChangesList))
-    user.save()
-    return user.ratingChanges
-"""
+
 def getProfile(username):
     user: User = getUser(username)
     rating_changes = []
