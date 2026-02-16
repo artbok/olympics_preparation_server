@@ -80,7 +80,11 @@ def getProfile(username):
                 int(part.strip()) 
                 for part in parts
             ]
-    averageAnswerTime = round(user.totalTimeInDuels / user.duelAnswers, 2)
+    if user.duelAnswers != 0:
+        averageAnswerTime = round(user.totalTimeInDuels / user.duelAnswers, 2)
+    else: 
+        averageAnswerTime = 0
+    
     solvedCorrectly = countCorrect(user.id)
     solvedIncorrectly = countIncorrect(user.id)
     return {
