@@ -1,9 +1,9 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import secrets
 from peewee import fn
-
+from models.duel import Duel
 from services.user_service import getUser, updateUserRating
 from services.duel_service import createDuel
 from models.user import User
@@ -28,7 +28,7 @@ class Player:
         self.username = user.name
         self.total_score = 0
 
-class Duel:
+class Game:
     def __init__(self, duelName, user1, user2):
         self.index = -1
         self.roundStartTime = None
@@ -88,7 +88,7 @@ class Duel:
         player.userObj.duelAnswers += 1
         player.userObj.totalTimeInDuels += dif
         return int(score)
-
+    
 duels = {}
 userQueue: list[UserInQueue] = []
 
@@ -166,7 +166,7 @@ def start_new_round(duelName):
 
 def match_found(player1: User, player2: User):
     duelName = f"Duel_{secrets.token_urlsafe(16)}"
-    duels[duelName] = Duel(duelName, player1, player2)
+    duels[duelName] = Game(duelName, player1, player2)
     
     socketio.emit(f"matchmaking_{player1.name}", {
         "code": "match_found", 
@@ -254,3 +254,112 @@ def handle_matchmaking(username):
         match_found(found_opponent.userObj, user)
     else:
         userQueue.append(UserInQueue(user))
+
+@duels_bp.route('/get-duels', methods=["GET"])
+def get_duels():
+    username = request.args.get('username', '').strip()
+    query = Duel.select()
+    if username:
+            query = query.where(
+                (Duel.username1 == username) | (Duel.username2 == username)
+            )
+        
+    duels = []
+    for d in query.dicts():
+            
+            duels.append({
+                'duel_id': d.get('duel_id'),
+                'username1': d.get('username1', d.get('player1', 'N/A')),
+                'username2': d.get('username2', d.get('player2', 'N/A')),
+                'score1': d.get('score1', d.get('player1_score', 0)),
+                'score2': d.get('score2', d.get('player2_score', 0)),
+                'created_at': str(d.get('created_at', '')),
+                'finished': d.get('finished', True)
+            })
+        
+    return jsonify(duels)
+
+@duels_bp.route('/cancel-duel', methods=['POST'])
+def cancel_duel():
+        data = request.get_json()
+            
+        duel_id = data.get('duel_id')
+        
+        duel = Duel.get_or_none(Duel.duel_id == duel_id)
+   
+        if not duel:
+            return jsonify({'error': f'Дуэль с ID {duel_id} не найдена'}), 404
+        
+
+        user1 = User.get_or_none(User.name == duel.username1)
+        user2 = User.get_or_none(User.name == duel.username2)
+        
+        if user1 is not None:      
+            old_rating = user1.rating
+            
+            if user1.ratingChanges:
+                changes_str = str(user1.ratingChanges)
+                
+                if '/' in changes_str:
+                    parts = changes_str.split('/')
+                    last_change = int(parts[-1])
+                    old_rating = user1.rating - last_change
+                    if len(parts) > 1:
+                        user1.ratingChanges = '/'.join(parts[:-1])
+                    else:
+                        user1.ratingChanges = '0'
+                else:
+                    try:
+                        change = int(changes_str)
+                        old_rating = user1.rating - change
+                        user1.ratingChanges = '0'
+                    except:
+                        old_rating = user1.rating
+                        user1.ratingChanges = '0'
+            else:
+                old_rating = user1.rating
+            
+            user1.rating = old_rating
+            user1.save()
+    
+        if user2 is not None:
+            
+            old_rating = user2.rating
+            
+            if user2.ratingChanges:
+                changes_str = str(user2.ratingChanges)
+                
+                if '/' in changes_str:
+                    parts = changes_str.split('/')
+                    last_change = int(parts[-1])
+                    old_rating = user2.rating - last_change
+                    
+                    if len(parts) > 1:
+                        user2.ratingChanges = '/'.join(parts[:-1])
+                    else:
+                        user2.ratingChanges = '0'
+                else:
+                    try:
+                        change = int(changes_str)
+                        old_rating = user2.rating - change
+                        user2.ratingChanges = '0'
+                    except:
+                        old_rating = user2.rating
+                        user2.ratingChanges = '0'
+            else:
+                old_rating = user2.rating
+            
+            user2.rating = old_rating
+            user2.save()
+    
+        duel.save()
+        
+        response_id = getattr(duel, 'id', getattr(duel, 'duel_id', duel_id))
+        return jsonify({
+            'success': True,
+            'message': f'Дуэль #{response_id} отменена. Рейтинги возвращены.',
+            'reverted': {
+                duel.username1: user1.rating if user1 else None,
+                duel.username2: user2.rating if user2 else None
+            }
+        })
