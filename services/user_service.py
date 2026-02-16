@@ -1,6 +1,6 @@
 from peewee import *
 from models.user import User
-from services.task_activity_service import countCorrect, countIncorrect
+from services.task_activities_service import countCorrect, countIncorrect
 import bcrypt
 
 

@@ -2,7 +2,7 @@ from peewee import *
 from models.task import Task
 from playhouse.shortcuts import model_to_dict
 from math import ceil
-from services.task_activity_service import getTaskActivity
+from services.task_activities_service import getTaskActivity
 
 def createTask(subject, topic, difficulty, description, hint, answer, explanation):
     return Task.create(subject = subject, topic = topic, difficulty = difficulty, description = description, hint = hint, answer = answer, explanation = explanation)
